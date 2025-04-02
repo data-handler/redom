@@ -180,11 +180,8 @@ function mount(parent, _child, before, replace) {
 }
 
 function trigger(el, eventName) {
-    console.log('TRIGGER:', eventName, 'on', el.__redom_view?.constructor?.name || el.nodeName, 'mounted:', el.__redom_mounted);
-
     if (eventName === 'onmount' && el.__redom_mounted) {
-        console.log('SKIPPING double onmount for', el.__redom_view?.constructor?.name || el.nodeName);
-        return;
+        return; // Prevent double onmount
     }
 
     if (eventName === "onmount" || eventName === "onremount") {
@@ -214,7 +211,6 @@ function trigger(el, eventName) {
         }
     }
 }
-
 
 function doMount(child, childEl, parentEl, oldParent) {
     if (!childEl.__redom_lifecycle) {

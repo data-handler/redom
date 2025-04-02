@@ -265,12 +265,9 @@
     return child;
   }
   function trigger(el, eventName) {
-    var _el$__redom_view, _view$eventName;
-    console.log('TRIGGER:', eventName, 'on', ((_el$__redom_view = el.__redom_view) === null || _el$__redom_view === undefined || (_el$__redom_view = _el$__redom_view.constructor) === null || _el$__redom_view === undefined ? undefined : _el$__redom_view.name) || el.nodeName, 'mounted:', el.__redom_mounted);
+    var _view$eventName;
     if (eventName === 'onmount' && el.__redom_mounted) {
-      var _el$__redom_view2;
-      console.log('SKIPPING double onmount for', ((_el$__redom_view2 = el.__redom_view) === null || _el$__redom_view2 === undefined || (_el$__redom_view2 = _el$__redom_view2.constructor) === null || _el$__redom_view2 === undefined ? undefined : _el$__redom_view2.name) || el.nodeName);
-      return;
+      return; // Prevent double onmount
     }
     if (eventName === "onmount" || eventName === "onremount") {
       el.__redom_mounted = true;
