@@ -265,9 +265,11 @@
     return child;
   }
   function trigger(el, eventName) {
-    var _view$eventName;
-    // Prevent duplicate lifecycle triggers
-    if (eventName === "onmount" && el.__redom_mounted || eventName === "onunmount" && !el.__redom_mounted) {
+    var _el$__redom_view, _view$eventName;
+    console.log('TRIGGER:', eventName, 'on', ((_el$__redom_view = el.__redom_view) === null || _el$__redom_view === undefined || (_el$__redom_view = _el$__redom_view.constructor) === null || _el$__redom_view === undefined ? undefined : _el$__redom_view.name) || el.nodeName, 'mounted:', el.__redom_mounted);
+    if (eventName === 'onmount' && el.__redom_mounted) {
+      var _el$__redom_view2;
+      console.log('SKIPPING double onmount for', ((_el$__redom_view2 = el.__redom_view) === null || _el$__redom_view2 === undefined || (_el$__redom_view2 = _el$__redom_view2.constructor) === null || _el$__redom_view2 === undefined ? undefined : _el$__redom_view2.name) || el.nodeName);
       return;
     }
     if (eventName === "onmount" || eventName === "onremount") {
@@ -276,26 +278,18 @@
       el.__redom_mounted = false;
     }
     var hooks = el.__redom_lifecycle;
-    if (!hooks) {
-      return;
-    }
+    if (!hooks) return;
     var view = el.__redom_view;
     var hookCount = 0;
-
-    // Call the hook on the view if it exists
     view === null || view === undefined || (_view$eventName = view[eventName]) === null || _view$eventName === undefined || _view$eventName.call(view);
-
-    // Count how many child hooks exist
     for (var hook in hooks) {
-      if (hook) {
-        hookCount++;
-      }
+      if (hook) hookCount++;
     }
     if (hookCount) {
       var traverse = el.firstChild;
       while (traverse) {
         var next = traverse.nextSibling;
-        trigger(traverse, eventName); // Recursive trigger for children
+        trigger(traverse, eventName);
         traverse = next;
       }
     }

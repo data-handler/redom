@@ -180,11 +180,10 @@ function mount(parent, _child, before, replace) {
 }
 
 function trigger(el, eventName) {
-    // Prevent duplicate lifecycle triggers
-    if (
-        (eventName === "onmount" && el.__redom_mounted) ||
-        (eventName === "onunmount" && !el.__redom_mounted)
-    ) {
+    console.log('TRIGGER:', eventName, 'on', el.__redom_view?.constructor?.name || el.nodeName, 'mounted:', el.__redom_mounted);
+
+    if (eventName === 'onmount' && el.__redom_mounted) {
+        console.log('SKIPPING double onmount for', el.__redom_view?.constructor?.name || el.nodeName);
         return;
     }
 
@@ -195,30 +194,22 @@ function trigger(el, eventName) {
     }
 
     const hooks = el.__redom_lifecycle;
-
-    if (!hooks) {
-        return;
-    }
+    if (!hooks) return;
 
     const view = el.__redom_view;
     let hookCount = 0;
 
-    // Call the hook on the view if it exists
     view?.[eventName]?.();
 
-    // Count how many child hooks exist
     for (const hook in hooks) {
-        if (hook) {
-            hookCount++;
-        }
+        if (hook) hookCount++;
     }
 
     if (hookCount) {
         let traverse = el.firstChild;
-
         while (traverse) {
             const next = traverse.nextSibling;
-            trigger(traverse, eventName); // Recursive trigger for children
+            trigger(traverse, eventName);
             traverse = next;
         }
     }
