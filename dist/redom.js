@@ -266,6 +266,10 @@
   }
   function trigger(el, eventName) {
     var _view$eventName;
+    // Prevent duplicate lifecycle triggers
+    if (eventName === "onmount" && el.__redom_mounted || eventName === "onunmount" && !el.__redom_mounted) {
+      return;
+    }
     if (eventName === "onmount" || eventName === "onremount") {
       el.__redom_mounted = true;
     } else if (eventName === "onunmount") {
@@ -277,7 +281,11 @@
     }
     var view = el.__redom_view;
     var hookCount = 0;
+
+    // Call the hook on the view if it exists
     view === null || view === undefined || (_view$eventName = view[eventName]) === null || _view$eventName === undefined || _view$eventName.call(view);
+
+    // Count how many child hooks exist
     for (var hook in hooks) {
       if (hook) {
         hookCount++;
@@ -287,7 +295,7 @@
       var traverse = el.firstChild;
       while (traverse) {
         var next = traverse.nextSibling;
-        trigger(traverse, eventName);
+        trigger(traverse, eventName); // Recursive trigger for children
         traverse = next;
       }
     }
@@ -343,7 +351,8 @@
         parentHooks[hook] = (parentHooks[hook] || 0) + hooks[hook];
       }
       if (triggered) {
-        break;
+        traverse = parent;
+        continue;
       }
       if (traverse.nodeType === Node.DOCUMENT_NODE || shadowRootAvailable && traverse instanceof ShadowRoot || parent !== null && parent !== undefined && parent.__redom_mounted) {
         trigger(traverse, remount ? "onremount" : "onmount");
